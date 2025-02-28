@@ -2,9 +2,6 @@
 
 A complete backend solution for an e-commerce platform with Node.js, Express, and Sequelize.
 
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![Build Status](https://github.com/yourusername/ecommerce-api/actions/workflows/ci.yml/badge.svg)](https://github.com/yourusername/ecommerce-api/actions)
-
 ## Features ✨
 - JWT Authentication & Authorization
 - Product Management (CRUD Operations)
@@ -56,4 +53,4 @@ POST	   /orders	          Create new order
 Contact 📧
 Vishnu Kaku - kakuvishnu959@gmail.com
 
-Project Link: https://github.com/yourusername/ecommerce-api
+Project Link: https://github.com/VishnuKaku/ecommerce_api.git
