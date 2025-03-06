@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config(); // Load environment variables from a .env file
 const express = require('express');
 const swaggerUI = require('swagger-ui-express');
 const swaggerDoc = require('./swagger.json');
@@ -11,17 +11,17 @@ const cors = require('cors');
 const app = express();
 
 // Middleware
-app.use(helmet());
-app.use(cors());
-app.use(express.json());
-app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDoc));
+app.use(helmet()); // Security middleware to set various HTTP headers
+app.use(cors()); // Middleware to enable Cross-Origin Resource Sharing
+app.use(express.json()); // Middleware to parse JSON request bodies
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDoc)); // Serve API documentation using Swagger
 
 // Routes
-app.use('/auth', routes.auth);
-app.use('/products', routes.products);
-app.use('/categories', routes.categories);
-app.use('/orders', routes.orders);
-app.use('/cart', cartRoutes);
+app.use('/auth', routes.auth); // Authentication routes
+app.use('/products', routes.products); // Product routes
+app.use('/categories', routes.categories); // Category routes
+app.use('/orders', routes.orders); // Order routes
+app.use('/cart', cartRoutes); // Cart routes
 
 // Database connection
 sequelize.sync()

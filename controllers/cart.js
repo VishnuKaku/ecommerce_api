@@ -1,7 +1,7 @@
 const { body, validationResult } = require('express-validator');
 const { Cart, Product } = require('../models');
 
-// Validation middleware
+// Validation middleware to handle validation errors
 const handleValidationErrors = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -10,14 +10,14 @@ const handleValidationErrors = (req, res, next) => {
   next();
 };
 
-// Validation chains
+// Validation chains for adding items to the cart
 exports.validateCartItem = [
   body('productId').isInt().withMessage('Invalid product ID'),
   body('quantity').isInt({ gt: 0 }).withMessage('Quantity must be at least 1'),
   handleValidationErrors
 ];
 
-// Controller methods
+// Controller method to add items to the cart
 exports.addToCart = async (req, res) => {
   try {
     const { productId, quantity } = req.body;
@@ -52,29 +52,31 @@ exports.addToCart = async (req, res) => {
   }
 };
 
+// Controller method to fetch the user's cart
 exports.getCart = async (req, res) => {
-    try {
-      const cart = await Cart.findAll({
-        where: { userId: req.user.id },
-        include: [
-          {
-            model: Product,
-            as: 'Product' // Ensure this matches the association alias
-          }
-        ]
-      });
-  
-      if (!cart || cart.length === 0) {
-        return res.status(404).json({ error: 'Cart is empty' });
-      }
-  
-      res.json(cart);
-    } catch (error) {
-      console.error('Error in getCart:', error); // Log the error
-      res.status(500).json({ error: 'Failed to fetch cart' });
-    }
-  };
+  try {
+    const cart = await Cart.findAll({
+      where: { userId: req.user.id },
+      include: [
+        {
+          model: Product,
+          as: 'Product' // Ensure this matches the association alias
+        }
+      ]
+    });
 
+    if (!cart || cart.length === 0) {
+      return res.status(404).json({ error: 'Cart is empty' });
+    }
+
+    res.json(cart);
+  } catch (error) {
+    console.error('Error in getCart:', error); // Log the error
+    res.status(500).json({ error: 'Failed to fetch cart' });
+  }
+};
+
+// Controller method to remove items from the cart
 exports.removeFromCart = async (req, res) => {
   try {
     const { id } = req.params;

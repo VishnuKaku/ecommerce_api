@@ -13,12 +13,13 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: 'ecommerce',
-    allowed_formats: ['jpg', 'jpeg', 'png'],
-    transformation: [{ width: 500, height: 500, crop: 'limit' }]
+    folder: 'ecommerce', // Folder name in Cloudinary where images will be stored
+    allowed_formats: ['jpg', 'jpeg', 'png'], // Allowed image formats
+    transformation: [{ width: 500, height: 500, crop: 'limit' }] // Image transformation settings
   }
 });
 
+// Initialize Multer with the configured Cloudinary storage
 const upload = multer({ storage: storage });
 
 module.exports = upload;

@@ -4,7 +4,7 @@ const cloudinary = require('../utils/cloudinary');
 const { Op } = require('sequelize');
 const multer = require('multer');
 
-// Validation middleware
+// Validation middleware to handle validation errors
 const handleValidationErrors = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -13,7 +13,7 @@ const handleValidationErrors = (req, res, next) => {
   next();
 };
 
-// Validation chains
+// Validation chains for product creation and updates
 exports.validateProduct = [
   body('name').notEmpty().withMessage('Product name is required'),
   body('price').isFloat({ gt: 0 }).withMessage('Invalid price'),
@@ -22,6 +22,7 @@ exports.validateProduct = [
   handleValidationErrors
 ];
 
+// Validation chains for product filters
 exports.validateProductFilters = [
   query('minPrice').optional().isFloat({ gt: 0 }),
   query('maxPrice').optional().isFloat({ gt: 0 }),
@@ -31,44 +32,46 @@ exports.validateProductFilters = [
   handleValidationErrors
 ];
 
+// Validation chains for product ID
 exports.validateObjectId = [
   param('id').isInt().withMessage('Invalid product ID'),
   handleValidationErrors
 ];
 
-// Controller methods
+// Controller method to create a product
 exports.createProduct = async (req, res) => {
-    try {
-      const { name, price, stock, categoryId } = req.body;
-  
-      // Validate categoryId if provided
-      if (categoryId) {
-        const category = await Category.findByPk(categoryId);
-        if (!category) {
-          return res.status(400).json({ error: 'Invalid category ID' });
-        }
-      }
-  
-      // Create the product with CategoryId
-      const product = await Product.create({
-        name,
-        price,
-        stock,
-        CategoryId: categoryId // Maps to the model's "CategoryId" field
-      });
-  
-      // Include the Category in the response
-      const productWithCategory = await Product.findByPk(product.id, {
-        include: Category
-      });
-  
-      res.status(201).json(productWithCategory);
-    } catch (error) {
-      console.error('Error in createProduct:', error);
-      res.status(500).json({ error: 'Product creation failed' });
-    }
-  };
+  try {
+    const { name, price, stock, categoryId } = req.body;
 
+    // Validate categoryId if provided
+    if (categoryId) {
+      const category = await Category.findByPk(categoryId);
+      if (!category) {
+        return res.status(400).json({ error: 'Invalid category ID' });
+      }
+    }
+
+    // Create the product with CategoryId
+    const product = await Product.create({
+      name,
+      price,
+      stock,
+      CategoryId: categoryId // Maps to the model's "CategoryId" field
+    });
+
+    // Include the Category in the response
+    const productWithCategory = await Product.findByPk(product.id, {
+      include: Category
+    });
+
+    res.status(201).json(productWithCategory);
+  } catch (error) {
+    console.error('Error in createProduct:', error);
+    res.status(500).json({ error: 'Product creation failed' });
+  }
+};
+
+// Controller method to update a product
 exports.updateProduct = async (req, res) => {
   try {
     const productId = parseInt(req.params.id, 10);
@@ -99,6 +102,7 @@ exports.updateProduct = async (req, res) => {
   }
 };
 
+// Controller method to delete a product
 exports.deleteProduct = async (req, res) => {
   try {
     const productId = parseInt(req.params.id, 10);
@@ -119,6 +123,7 @@ exports.deleteProduct = async (req, res) => {
   }
 };
 
+// Controller method to fetch products with filters
 exports.getProducts = async (req, res) => {
   try {
     const { minPrice, maxPrice, categoryId, search, page = 1, limit = 10 } = req.query;
@@ -144,6 +149,7 @@ exports.getProducts = async (req, res) => {
   }
 };
 
+// Controller method to upload product images
 exports.uploadImage = async (req, res) => {
   try {
     console.log('Request File:', req.file); // Log the uploaded file

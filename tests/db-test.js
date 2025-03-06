@@ -1,12 +1,12 @@
-require('dotenv').config();
-const { sequelize } = require('../models');
+require('dotenv').config(); // Load environment variables from a .env file
+const { sequelize } = require('../models'); // Import the Sequelize instance from the models
 
 (async () => {
   try {
-    await sequelize.authenticate();
+    await sequelize.authenticate(); // Authenticate the database connection
     console.log('✅ Database connection successful!');
-    await sequelize.close();
+    await sequelize.close(); // Close the database connection
   } catch (error) {
-    console.error('❌ Connection failed:', error);
+    console.error('❌ Connection failed:', error); // Log any connection errors
   }
 })();

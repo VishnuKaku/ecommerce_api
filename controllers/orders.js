@@ -1,7 +1,7 @@
 const { body, validationResult } = require('express-validator');
 const { Order, OrderItem, Product } = require('../models');
 
-// Validation middleware
+// Validation middleware to handle validation errors
 const handleValidationErrors = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -10,7 +10,7 @@ const handleValidationErrors = (req, res, next) => {
   next();
 };
 
-// Validation chains
+// Validation chains for creating an order
 exports.validateOrder = [
   body('items').isArray({ min: 1 }).withMessage('At least one item is required'),
   body('items.*.productId').isInt().withMessage('Invalid product ID'),
@@ -18,7 +18,7 @@ exports.validateOrder = [
   handleValidationErrors
 ];
 
-// Controller methods
+// Controller method to create an order
 exports.createOrder = async (req, res) => {
   try {
     const { items } = req.body;
@@ -31,8 +31,10 @@ exports.createOrder = async (req, res) => {
       return res.status(404).json({ error: 'One or more products not found' });
     }
 
+    // Create the order
     const order = await Order.create({ userId: req.user.id });
 
+    // Create order items
     const orderItems = await Promise.all(items.map(async item => {
       const product = await Product.findByPk(item.productId);
       return OrderItem.create({
@@ -49,28 +51,31 @@ exports.createOrder = async (req, res) => {
   }
 };
 
+// Controller method to fetch the user's order history
 exports.getOrderHistory = async (req, res) => {
-    try {
-      const orders = await Order.findAll({
-        where: { UserId: req.user.id }, // Ensure this matches the column name
-        include: [
-          {
-            model: OrderItem,
-            include: [Product] // Include Product in OrderItem
-          }
-        ]
-      });
-  
-      if (!orders || orders.length === 0) {
-        return res.status(404).json({ error: 'No orders found for this user' });
-      }
-  
-      res.json(orders);
-    } catch (error) {
-      console.error('Error in getOrderHistory:', error); // Log the error
-      res.status(500).json({ error: 'Failed to fetch order history' });
+  try {
+    const orders = await Order.findAll({
+      where: { UserId: req.user.id }, // Ensure this matches the column name
+      include: [
+        {
+          model: OrderItem,
+          include: [Product] // Include Product in OrderItem
+        }
+      ]
+    });
+
+    if (!orders || orders.length === 0) {
+      return res.status(404).json({ error: 'No orders found for this user' });
     }
-  };
+
+    res.json(orders);
+  } catch (error) {
+    console.error('Error in getOrderHistory:', error); // Log the error
+    res.status(500).json({ error: 'Failed to fetch order history' });
+  }
+};
+
+// Controller method to fetch all orders (admin)
 exports.getAllOrders = async (req, res) => {
   try {
     const orders = await Order.findAll({
